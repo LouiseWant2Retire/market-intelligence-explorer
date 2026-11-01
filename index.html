@@ -9,16 +9,20 @@
 :root{color-scheme:light;--paper:#f6edd8;--card:#fffaf0;--forest:#3f6b4a;--brown:#8a5a36;--navy:#25405e;--ink:#3a2e24;--gold:#d9a441;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{width:100%;max-width:100%}
+#root{width:100%;min-width:0}
+.wrap,.page,.rc,.g,.sec,.power,.opt{min-width:0;max-width:100%}
+.page *{overflow-wrap:anywhere}
 body{margin:0;font-family:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;color:var(--ink);background:var(--paper);
 background-image:radial-gradient(circle at 12% 8%,#cfe3b5aa 0,transparent 38%),radial-gradient(circle at 90% 20%,#f3c98b88 0,transparent 36%),radial-gradient(circle at 70% 95%,#a9c3d988 0,transparent 40%);min-height:100vh;line-height:1.7}
-.wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px}
-.page{background:var(--card);border:3px solid var(--brown);border-radius:22px 28px 20px 30px/28px 20px 30px 22px;box-shadow:0 8px 0 #8a5a3633,0 18px 40px #5a3d2a22;padding:24px 20px;animation:in .5s ease}
+.wrap{width:100%;max-width:760px;margin:0 auto;padding:20px 16px 48px}
+.page{width:100%;background:var(--card);border:3px solid var(--brown);border-radius:22px 28px 20px 30px/28px 20px 30px 22px;box-shadow:0 8px 0 #8a5a3633,0 18px 40px #5a3d2a22;padding:24px 20px;animation:in .5s ease}
 @keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 h1,h2,h3{margin:.2em 0;line-height:1.35}
 h1{font-size:clamp(28px,7vw,44px);color:var(--forest);font-weight:900;text-align:center}
 h2{font-size:clamp(20px,4.6vw,26px);color:var(--navy)}
 .sub{text-align:center;color:var(--brown);letter-spacing:.15em;font-size:14px}
-.btn{font:inherit;font-weight:700;font-size:18px;color:#fff;background:var(--forest);border:3px solid #2c4d35;border-radius:999px;padding:12px 30px;cursor:pointer;box-shadow:0 5px 0 #2c4d35;transition:transform .1s}
+.btn{max-width:100%;font:inherit;font-weight:700;font-size:18px;color:#fff;background:var(--forest);border:3px solid #2c4d35;border-radius:999px;padding:12px 30px;cursor:pointer;box-shadow:0 5px 0 #2c4d35;transition:transform .1s}
 .btn:active{transform:translateY(3px);box-shadow:0 2px 0 #2c4d35}
 .btn.alt{background:var(--card);color:var(--brown);border-color:var(--brown);box-shadow:0 5px 0 var(--brown)}
 .center{text-align:center}.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
@@ -30,22 +34,25 @@ h2{font-size:clamp(20px,4.6vw,26px);color:var(--navy)}
 .opt{display:block;width:100%;text-align:left;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:2.5px solid #c9b48b;border-radius:16px;padding:13px 16px;margin-bottom:11px;cursor:pointer;transition:.15s}
 .opt:hover{border-color:var(--forest);background:#f2f7e8;transform:translateX(3px)}
 .opt.sel{border-color:var(--forest);background:#dcebc8}
-.hero{display:flex;justify-content:center;margin:6px 0}
-.hero svg{width:min(260px,70vw);height:auto}
+.hero{display:flex;justify-content:center;margin:6px 0;min-width:0}
+.hero svg{display:block;width:100%;max-width:260px;height:auto}
+.team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;margin:6px 0;min-width:0}
+.team svg{display:block;width:100%;height:auto}
 .tag{display:inline-block;background:var(--navy);color:#fff;border-radius:99px;padding:2px 14px;font-size:13px;letter-spacing:.1em}
 .name{font-size:clamp(24px,6vw,34px);font-weight:900;margin:6px 0}
 .power{background:#fdf0cc;border:2.5px dashed var(--gold);border-radius:16px;padding:12px 16px;margin:12px 0;font-weight:700}
-.gear{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.gear{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:10px 0}
 .g{background:#fff;border:2.5px solid var(--brown);border-radius:16px;padding:12px 8px;text-align:center}
 .g b{display:block;font-size:15px;color:var(--navy)}.g span{font-size:14px;color:var(--brown)}
 .g .ic{font-size:38px;line-height:1.2}
 .sec{background:#eef4e4;border-left:6px solid var(--forest);border-radius:12px;padding:12px 16px;margin:14px 0}
 .mini{display:flex;align-items:center;gap:12px;background:#fff;border:2.5px solid var(--navy);border-radius:16px;padding:8px 14px;margin:10px 0}
 .mini svg{width:70px;flex:none}
+.mini>div{min-width:0}
 .rc{border:5px double var(--gold);border-radius:22px;padding:16px;background:linear-gradient(#fffdf5,#f8ebc9);text-align:center;max-width:420px;margin:0 auto}
 .rc .sm{font-size:13px;color:var(--brown)}
 .rc .gear{margin-bottom:6px}
-@media(max-width:420px){.page{padding:18px 14px}.gear{grid-template-columns:1fr 1fr;gap:8px}.btn{font-size:16px;padding:11px 22px}}
+@media(max-width:420px){.wrap{padding:14px 12px 36px}.page{padding:18px 14px}.gear{gap:8px}.g{padding:10px 6px}.g .ic{font-size:32px}.btn{font-size:16px;padding:11px 22px}.rc{padding:12px}.mini svg{width:56px}.opt{padding:12px 14px;font-size:15px}}
 </style>
 </head>
 <body>
@@ -169,8 +176,8 @@ function Home({go}){return(
  <div className="page center">
   <div className="sub">MARKET INTELLIGENCE WORKSHOP</div>
   <h1>Market Intelligence Explorer</h1>
-  <div className="hero" style={{gap:0,flexWrap:"wrap"}}>
-   {["D","S","J","M"].map(k=><div key={k} style={{width:"23%",minWidth:70}}><Hero k={k}/></div>)}
+  <div className="team">
+   {["D","S","J","M"].map(k=><Hero key={k} k={k}/>)}
   </div>
   <h2>市場情報的冒險，即將展開</h2>
   <p>在情報大陸上，每位探險家都有自己獨特的蒐集方式。<br/>回答 8 個冒險情境，找出你的探險角色與專屬裝備！</p>
@@ -238,8 +245,8 @@ function Closing({restart,r}){
  <div className="page center">
   <div className="sub">最後一站</div>
   <h1 style={{fontSize:"clamp(24px,6vw,36px)"}}>Your next adventure starts here!</h1>
-  <div className="hero" style={{gap:0,flexWrap:"wrap"}}>
-   {["D","S","J","M"].map(k=><div key={k} style={{width:"23%",minWidth:70}}><Hero k={k}/></div>)}
+  <div className="team">
+   {["D","S","J","M"].map(k=><Hero key={k} k={k}/>)}
   </div>
   <p>市場情報沒有唯一正確的蒐集方式。你的專長是起點，而不同的分析工具能讓你看見更多可能性。</p>
   <h2>準備好升級你的 Market Intelligence Skills 了嗎？</h2>
