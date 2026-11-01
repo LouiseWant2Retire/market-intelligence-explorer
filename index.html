@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Market Intelligence Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--paper:#f6edd8;--card:#fffaf0;--forest:#3f6b4a;--brown:#8a5a36;--navy:#25405e;--ink:#3a2e24;--gold:#d9a441;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;font-family:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;color:var(--ink);background:var(--paper);
+background-image:radial-gradient(circle at 12% 8%,#cfe3b5aa 0,transparent 38%),radial-gradient(circle at 90% 20%,#f3c98b88 0,transparent 36%),radial-gradient(circle at 70% 95%,#a9c3d988 0,transparent 40%);min-height:100vh;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+.page{background:var(--card);border:3px solid var(--brown);border-radius:22px 28px 20px 30px/28px 20px 30px 22px;box-shadow:0 8px 0 #8a5a3633,0 18px 40px #5a3d2a22;padding:24px 20px;animation:in .5s ease}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+h1,h2,h3{margin:.2em 0;line-height:1.35}
+h1{font-size:clamp(28px,7vw,44px);color:var(--forest);font-weight:900;text-align:center}
+h2{font-size:clamp(20px,4.6vw,26px);color:var(--navy)}
+.sub{text-align:center;color:var(--brown);letter-spacing:.15em;font-size:14px}
+.btn{font:inherit;font-weight:700;font-size:18px;color:#fff;background:var(--forest);border:3px solid #2c4d35;border-radius:999px;padding:12px 30px;cursor:pointer;box-shadow:0 5px 0 #2c4d35;transition:transform .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #2c4d35}
+.btn.alt{background:var(--card);color:var(--brown);border-color:var(--brown);box-shadow:0 5px 0 var(--brown)}
+.center{text-align:center}.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.prog{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.bar{flex:1;height:14px;border-radius:99px;background:#e6d6b2;border:2px solid var(--brown);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--forest),#8fbf6a);transition:width .4s}
+.stage{font-size:13px;color:var(--brown);font-weight:700}
+.q{font-size:clamp(18px,4.4vw,22px);font-weight:700;margin:8px 0 16px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:2.5px solid #c9b48b;border-radius:16px;padding:13px 16px;margin-bottom:11px;cursor:pointer;transition:.15s}
+.opt:hover{border-color:var(--forest);background:#f2f7e8;transform:translateX(3px)}
+.opt.sel{border-color:var(--forest);background:#dcebc8}
+.hero{display:flex;justify-content:center;margin:6px 0}
+.hero svg{width:min(260px,70vw);height:auto}
+.tag{display:inline-block;background:var(--navy);color:#fff;border-radius:99px;padding:2px 14px;font-size:13px;letter-spacing:.1em}
+.name{font-size:clamp(24px,6vw,34px);font-weight:900;margin:6px 0}
+.power{background:#fdf0cc;border:2.5px dashed var(--gold);border-radius:16px;padding:12px 16px;margin:12px 0;font-weight:700}
+.gear{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.g{background:#fff;border:2.5px solid var(--brown);border-radius:16px;padding:12px 8px;text-align:center}
+.g b{display:block;font-size:15px;color:var(--navy)}.g span{font-size:14px;color:var(--brown)}
+.g .ic{font-size:38px;line-height:1.2}
+.sec{background:#eef4e4;border-left:6px solid var(--forest);border-radius:12px;padding:12px 16px;margin:14px 0}
+.mini{display:flex;align-items:center;gap:12px;background:#fff;border:2.5px solid var(--navy);border-radius:16px;padding:8px 14px;margin:10px 0}
+.mini svg{width:70px;flex:none}
+.rc{border:5px double var(--gold);border-radius:22px;padding:16px;background:linear-gradient(#fffdf5,#f8ebc9);text-align:center;max-width:420px;margin:0 auto}
+.rc .sm{font-size:13px;color:var(--brown)}
+.rc .gear{margin-bottom:6px}
+@media(max-width:420px){.page{padding:18px 14px}.gear{grid-template-columns:1fr 1fr;gap:8px}.btn{font-size:16px;padding:11px 22px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<script type="text/babel">
+const {useState,useMemo}=React;
+
+/* ===== 人格資料 ===== */
+const P={
+ D:{en:"The Data Digger",zh:"數據挖掘者",c:"#25405e",c2:"#5f86ad",power:"把數字變成市場地圖！",trait:"擅長市場數據、規模估算、數據拆解。",
+  gear:[{ic:"📡",en:"Market Radar",zh:"市場雷達"},{ic:"⛏️",en:"Power Drill",zh:"數據挖掘電鑽"}],
+  up:"這次冒險將帶你挖掘數字背後的更多可能，讓你不只看見市場數據，更能從不同線索中發現值得探索的機會！"},
+ S:{en:"The Market Sniffer",zh:"市場情報獵犬",c:"#3f6b4a",c2:"#8fbf6a",power:"比市場變化更早聞到機會！",trait:"擅長市場趨勢、產業訊息、外部環境變化。",
+  gear:[{ic:"🔭",en:"360° Signal Scanner",zh:"全方位情報掃描器"},{ic:"🗺️",en:"Trend Map",zh:"趨勢尋寶地圖"}],
+  up:"這次冒險將幫助你把敏銳的市場嗅覺轉化為更清晰的洞察，從變化萬千的市場訊息中，找到值得關注的方向！"},
+ J:{en:"The Journey Guide",zh:"病患旅程嚮導",c:"#a5602f",c2:"#e0a066",power:"看見數字背後真正的人！",trait:"擅長客戶需求、病患旅程、使用者體驗。",
+  gear:[{ic:"🥽",en:"Journey Mapping Goggles",zh:"旅程透視眼鏡"},{ic:"🧡",en:"Compassion Compass",zh:"同理心羅盤"}],
+  up:"這次冒險將帶你從更多角度理解市場與需求，讓你看見數字之外的故事，並找到市場機會與真實需求之間的連結！"},
+ M:{en:"The Master Explorer",zh:"資深冒險家",c:"#6b3d2e",c2:"#c98a5e",power:"把不同線索拼成完整的策略地圖！",trait:"擅長整合市場資訊、競爭分析、內外部環境與策略思考。",
+  gear:[{ic:"🧭",en:"Strategic Compass",zh:"戰略羅盤"},{ic:"🔍",en:"SWOT Vision Goggles",zh:"SWOT 洞察眼鏡"}],
+  up:"這次冒險將幫助你整合不同的市場線索與觀點，跳脫單一角度思考，逐步拼湊出更完整的市場全貌！"}
+};
+
+/* ===== 八題（選項對應人格：D/S/J/M，各一個）===== */
+const Q=[
+ {st:"從問題開始",q:"主管突然問你：「我們這個產品在台灣的市場到底有多大？」你第一個反應是？",o:[
+  ["J","先了解哪些醫院、科別或使用情境可能真正需要這項產品。"],
+  ["D","先找出可以量化的資料，再逐步估算市場規模。"],
+  ["M","先確認主管想知道的是整體市場、可服務市場，還是我們真正有機會取得的市場。"],
+  ["S","先看看近期政策、產業變化或新技術，有沒有影響市場的訊號。"]]},
+ {st:"開始蒐集情報",q:"公司準備開發一個新市場，但手上幾乎沒有可靠的市場資料，你會？",o:[
+  ["S","從產業新聞、政策和技術發展中，找出可能被忽略的市場訊號。"],
+  ["M","先盤點公司的現有能力、資源與限制，再思考進入市場的可行性。"],
+  ["D","找替代數據來源，建立合理假設，一步步推估市場規模。"],
+  ["J","找 Sales 或客戶聊聊，確認實際使用情境與尚未被滿足的需求。"]]},
+ {st:"解讀市場變化",q:"競爭對手突然推出一台新型實驗室設備，你最想先知道什麼？",o:[
+  ["M","這項產品會如何改變競爭格局？我們的定位和優劣勢是否需要調整？"],
+  ["J","它是否真的改善了實驗室的工作流程？使用者會怎麼評價？"],
+  ["S","這是不是產業的新方向？其他競爭者是否也開始跟進？"],
+  ["D","它的價格、銷售量和市場滲透情況如何？對市場規模有什麼影響？"]]},
+ {st:"判斷機會",q:"Sales 告訴你：「最近有好幾家醫院都對這個新產品很有興趣！」你接下來會？",o:[
+  ["D","試著估算這些醫院背後代表多少潛在需求，以及整體市場機會。"],
+  ["J","深入了解醫院為什麼有興趣，以及真正想解決的問題。"],
+  ["S","觀察是否有政策、疾病趨勢或產業變化正在帶動這波需求。"],
+  ["M","評估這些需求是否能形成長期商業機會，以及公司是否具備承接能力。"]]},
+ {st:"判斷情報可信度",q:"你手上有五份市場報告，但每份報告的市場規模都不一樣，你會？",o:[
+  ["J","先確認不同報告所涵蓋的市場與客戶群是否符合實際使用情境。"],
+  ["S","繼續搜尋其他來源，確認是否有更新、更可信的市場訊息。"],
+  ["M","比較不同報告背後的假設，整理出合理範圍及其對策略的影響。"],
+  ["D","逐一檢查數據來源、計算方式與市場定義，找出數字差異的原因。"]]},
+ {st:"尋找下一個機會",q:"你負責的成熟產品已經上市十年，市場成長開始停滯，你會？",o:[
+  ["S","觀察市場是否出現新的政策、技術或競爭變化，可能帶來下一波成長。"],
+  ["D","分析歷年銷售、客戶數量和市場滲透率，找出尚未開發的空間。"],
+  ["J","重新了解客戶的使用情境，尋找目前產品尚未滿足的需求。"],
+  ["M","重新檢視產品競爭力、內部資源與外部環境，思考產品下一階段的定位。"]]},
+ {st:"重新思考",q:"做完 SWOT 後，你發現 Weakness 比 Strength 還多，你會？",o:[
+  ["D","找出數據，確認這些弱點對實際市場競爭的影響有多大。"],
+  ["M","把內外部因素放在一起看，思考有哪些策略組合可以改善現況。"],
+  ["J","回頭確認客戶真正重視哪些弱點，以及哪些問題對使用者影響最大。"],
+  ["S","再看看外部市場是否出現新的機會或威脅，可能改變目前的局勢。"]]},
+ {st:"從情報走向決策",q:"主管最後問你：「所以我們下一步到底該怎麼做？」你最想先補充什麼？",o:[
+  ["M","整合目前的內外部資訊，提出明確的優先順序與行動策略。"],
+  ["S","補充市場趨勢與競爭情報，避免錯過機會或低估威脅。"],
+  ["D","提供更可靠的市場規模與成長數據，讓投資決策有依據。"],
+  ["J","補充客戶與病患的實際需求，確認策略能解決真正的問題。"]]}
+];
+
+const shuffle=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+
+/* ===== 計分與同分判定：同分時，比較各人格「最後一次被選中的題號」，越後面越優先（第8→7→6…）===== */
+function rank(ans){
+ const s={D:0,S:0,J:0,M:0},last={D:-1,S:-1,J:-1,M:-1};
+ ans.forEach((k,i)=>{s[k]++;last[k]=i});
+ return Object.keys(s).sort((a,b)=>s[b]-s[a]||last[b]-last[a]);
+}
+
+/* ===== 一致風格的水彩繪本角色 ===== */
+function Hero({k}){
+ const p=P[k],id="w"+k;
+ return(
+ <svg viewBox="0 0 200 220" role="img" aria-label={p.en}>
+  <defs>
+   <filter id={id}><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+   <radialGradient id={id+"g"} cx=".5" cy=".4"><stop offset="0" stopColor={p.c2}/><stop offset="1" stopColor={p.c}/></radialGradient>
+  </defs>
+  <g filter={`url(#${id})`} stroke="#4a3426" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round">
+   <ellipse cx="100" cy="205" rx="68" ry="10" fill="#8a5a3633" stroke="none"/>
+   <circle cx="100" cy="110" r="96" fill={p.c2} opacity=".22" stroke="none"/>
+   <path d="M52 200 Q56 128 100 120 Q144 128 148 200 Z" fill={`url(#${id}g)`}/>
+   {/* 頭部 */}
+   {k==="S"&&<><path d="M58 70 Q38 78 44 112 Q62 104 70 84Z" fill="#b9814f"/><path d="M142 70 Q162 78 156 112 Q138 104 130 84Z" fill="#b9814f"/></>}
+   <circle cx="100" cy="86" r="38" fill="#fbe0bf"/>
+   <circle cx="87" cy="86" r="4" fill="#4a3426" stroke="none"/><circle cx="113" cy="86" r="4" fill="#4a3426" stroke="none"/>
+   <path d="M90 102 Q100 111 110 102" fill="none"/>
+   <circle cx="78" cy="98" r="6" fill="#f2a58a" opacity=".6" stroke="none"/><circle cx="122" cy="98" r="6" fill="#f2a58a" opacity=".6" stroke="none"/>
+   {k==="S"&&<ellipse cx="100" cy="97" rx="7" ry="5" fill="#4a3426"/>}
+   {/* 帽子與配件 */}
+   {k==="D"&&<><path d="M60 72 Q62 40 100 40 Q138 40 140 72Z" fill="#f0b73d"/><rect x="56" y="70" width="88" height="9" rx="4" fill="#d9962c"/><circle cx="100" cy="52" r="8" fill="#fff6c2"/></>}
+   {k==="S"&&<path d="M64 62 Q100 24 136 62 Q100 50 64 62Z" fill="#6f4a2d"/>}
+   {k==="J"&&<><circle cx="86" cy="86" r="14" fill="#cfe9f2" opacity=".6"/><circle cx="114" cy="86" r="14" fill="#cfe9f2" opacity=".6"/><path d="M100 86h0M72 84L60 80M128 84L140 80" fill="none"/><path d="M62 66 Q100 28 138 66 Q100 54 62 66Z" fill="#e6b0a0"/></>}
+   {k==="M"&&<><path d="M44 74 Q100 58 156 74 Q140 80 100 76 Q60 80 44 74Z" fill="#7a4b2a"/><path d="M66 70 Q70 36 100 36 Q130 36 134 70Z" fill="#8b5a33"/><path d="M130 44 Q158 30 154 56" fill="none" stroke="#c0392b"/></>}
+   {/* 手持道具 */}
+   {k==="D"&&<><path d="M140 150 L176 120" stroke="#6b7a8a" strokeWidth="10"/><circle cx="178" cy="118" r="9" fill="#d97b4a"/></>}
+   {k==="S"&&<><circle cx="150" cy="150" r="20" fill="#e8f0d0"/><path d="M150 134 L156 150 L150 166 L144 150Z" fill="#d95f4a"/></>}
+   {k==="J"&&<><rect x="136" y="132" width="26" height="30" rx="6" fill="#f6c76a"/><path d="M142 132 Q149 118 156 132" fill="none"/><circle cx="149" cy="147" r="5" fill="#fff3b8"/></>}
+   {k==="M"&&<><circle cx="150" cy="150" r="21" fill="#f7e6b0"/><path d="M150 134 L157 150 L150 166 L143 150Z" fill="#25405e"/></>}
+   <circle cx="62" cy="168" r="9" fill="#fbe0bf"/>
+  </g>
+ </svg>);
+}
+
+function Gear({p}){return(
+ <div className="gear">{p.gear.map(g=>(
+  <div className="g" key={g.en}><div className="ic">{g.ic}</div><b>{g.en}</b><span>{g.zh}</span></div>))}</div>)}
+
+/* ===== 各頁面 ===== */
+function Home({go}){return(
+ <div className="page center">
+  <div className="sub">MARKET INTELLIGENCE WORKSHOP</div>
+  <h1>Market Intelligence Explorer</h1>
+  <div className="hero" style={{gap:0,flexWrap:"wrap"}}>
+   {["D","S","J","M"].map(k=><div key={k} style={{width:"23%",minWidth:70}}><Hero k={k}/></div>)}
+  </div>
+  <h2>市場情報的冒險，即將展開</h2>
+  <p>在情報大陸上，每位探險家都有自己獨特的蒐集方式。<br/>回答 8 個冒險情境，找出你的探險角色與專屬裝備！</p>
+  <div className="row"><button className="btn" onClick={go}>開始探險任務 ✨</button></div>
+  <p style={{fontSize:13,color:"#8a5a36",marginTop:18}}>約 2 分鐘．沒有對錯，憑直覺選擇最像你的做法</p>
+ </div>)}
+
+function Quiz({order,onDone}){
+ const [i,setI]=useState(0),[ans,setAns]=useState([]),[sel,setSel]=useState(null);
+ const q=Q[i];
+ const pick=k=>{
+  if(sel!==null)return;setSel(k);
+  setTimeout(()=>{const a=[...ans,k];setSel(null);
+   if(i===Q.length-1)onDone(a);else{setAns(a);setI(i+1);window.scrollTo({top:0,behavior:"smooth"})}},380);
+ };
+ return(
+ <div className="page" key={i}>
+  <div className="prog"><span style={{fontWeight:900,color:"var(--forest)"}}>{i+1}/8</span>
+   <div className="bar"><i style={{width:`${(i+1)/8*100}%`}}/></div></div>
+  <div className="stage">第 {i+1} 站 · {q.st}</div>
+  <div className="q">{q.q}</div>
+  {order[i].map(([k,t])=>(
+   <button key={k} className={"opt"+(sel===k?" sel":"")} onClick={()=>pick(k)}>{t}</button>))}
+ </div>)}
+
+function Reveal({r,next}){
+ const m=P[r[0]],s=P[r[1]];
+ return(
+ <div className="page">
+  <div className="center">
+   <div className="sub">探險結果揭曉</div>
+   <span className="tag">你的主要人格</span>
+   <div className="hero"><Hero k={r[0]}/></div>
+   <div className="name" style={{color:m.c}}>{m.en}</div>
+   <h2>{m.zh}</h2>
+  </div>
+  <div className="power">🌟 你的情報蒐集超能力：{m.power}</div>
+  <h3>你的兩件專屬裝備</h3>
+  <Gear p={m}/>
+  <div className="sec"><b>你的次要人格</b>
+   <div className="mini"><Hero k={r[1]}/><div><div style={{fontWeight:900,color:s.c}}>{s.en}</div><div>{s.zh}</div><div style={{fontSize:14}}>{s.trait}</div></div></div></div>
+  <div className="sec" style={{background:"#fdf0cc",borderColor:"var(--gold)"}}><b>恭喜！你很適合參加這次 Workshop！</b><p style={{margin:"6px 0 0"}}>{m.up}</p></div>
+  <div className="row"><button className="btn" onClick={next}>查看我的角色卡 🎴</button></div>
+ </div>)}
+
+function Card({r,next}){
+ const m=P[r[0]],s=P[r[1]];
+ return(
+ <div className="page">
+  <div className="rc">
+   <div className="sm">MARKET INTELLIGENCE EXPLORER · 探險家角色卡</div>
+   <div className="hero"><Hero k={r[0]}/></div>
+   <div className="name" style={{color:m.c,margin:0}}>{m.en}</div>
+   <div style={{fontWeight:700}}>{m.zh}</div>
+   <div className="power" style={{fontSize:15}}>{m.power}</div>
+   <Gear p={m}/>
+   <div className="sm">次要人格｜{s.en}・{s.zh}</div>
+  </div>
+  <p className="center" style={{fontSize:14,color:"var(--brown)"}}>📸 截圖留下你的角色卡，和夥伴交換探險故事！</p>
+  <div className="row"><button className="btn" onClick={next}>前往最後一站 🏕️</button></div>
+ </div>)}
+
+function Closing({restart,r}){
+ return(
+ <div className="page center">
+  <div className="sub">最後一站</div>
+  <h1 style={{fontSize:"clamp(24px,6vw,36px)"}}>Your next adventure starts here!</h1>
+  <div className="hero" style={{gap:0,flexWrap:"wrap"}}>
+   {["D","S","J","M"].map(k=><div key={k} style={{width:"23%",minWidth:70}}><Hero k={k}/></div>)}
+  </div>
+  <p>市場情報沒有唯一正確的蒐集方式。你的專長是起點，而不同的分析工具能讓你看見更多可能性。</p>
+  <h2>準備好升級你的 Market Intelligence Skills 了嗎？</h2>
+  <div className="row"><button className="btn alt" onClick={restart}>🔄 重新測驗</button></div>
+ </div>)}
+
+function App(){
+ const [view,setView]=useState("home"),[res,setRes]=useState(null),[order,setOrder]=useState([]);
+ const start=()=>{setOrder(Q.map(q=>shuffle(q.o)));setView("quiz");window.scrollTo(0,0)};
+ const to=v=>{setView(v);window.scrollTo({top:0})};
+ return(
+ <div className="wrap">
+  {view==="home"&&<Home go={start}/>}
+  {view==="quiz"&&<Quiz order={order} onDone={a=>{setRes(rank(a));to("reveal")}}/>}
+  {view==="reveal"&&<Reveal r={res} next={()=>to("card")}/>}
+  {view==="card"&&<Card r={res} next={()=>to("closing")}/>}
+  {view==="closing"&&<Closing r={res} restart={()=>{setRes(null);to("home")}}/>}
+ </div>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
