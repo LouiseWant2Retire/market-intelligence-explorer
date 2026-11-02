@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f2238">
 <title>Market Intelligence Explorer</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -52,6 +53,30 @@ h2{font-size:clamp(20px,4.6vw,26px);color:var(--navy)}
 .rc{border:5px double var(--gold);border-radius:22px;padding:16px;background:linear-gradient(#fffdf5,#f8ebc9);text-align:center;max-width:420px;margin:0 auto}
 .rc .sm{font-size:13px;color:var(--brown)}
 .rc .gear{margin-bottom:6px}
+.fate{margin-top:24px;padding-top:18px;border-top:3px dashed var(--gold)}
+.tube{display:flex;justify-content:center;margin:10px 0;perspective:600px}
+.tube svg{display:block;width:min(130px,40%);height:auto;transform-origin:50% 90%}
+.tube.shaking svg{animation:shake .45s ease-in-out infinite}
+@keyframes shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg) translateY(-4px)}50%{transform:rotate(11deg)}80%{transform:rotate(-8deg) translateY(-3px)}}
+.spark{font-size:26px;letter-spacing:.4em;height:34px;animation:tw 1s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.3;transform:scale(.9)}50%{opacity:1;transform:scale(1.15)}}
+.fcard{max-width:440px;margin:12px auto;border:5px double var(--gold);border-radius:20px;padding:16px 14px;background:linear-gradient(#fffdf5,#f8ebc9);animation:flip .8s ease both;transform-origin:center}
+@keyframes flip{from{opacity:0;transform:rotateY(90deg) scale(.7)}to{opacity:1;transform:none}}
+.fcard .fic{font-size:44px;line-height:1.2}
+.fcard .fn{font-size:clamp(22px,6vw,28px);font-weight:900;color:var(--navy)}
+.fcard .fd{margin-top:10px;font-weight:900;color:var(--forest)}
+.hint{background:#fdf0cc;border:2px dashed var(--gold);border-radius:12px;padding:8px 12px;margin:10px auto;max-width:440px;font-size:14px}
+a.btn{display:inline-block;text-decoration:none}
+@media(prefers-reduced-motion:reduce){.tube.shaking svg,.spark,.fcard{animation:none}}
+/* ===== 暴風夜海・海盜船探險主題 ===== */
+body{background-color:#0d1b2e;background-image:radial-gradient(ellipse at 88% 10%,#f0b73d38 0,transparent 28%),radial-gradient(ellipse at 15% 5%,#46688a99 0,transparent 42%),radial-gradient(ellipse at 65% 20%,#2c4a66aa 0,transparent 38%),linear-gradient(#0f2238 0%,#15384f 52%,#0b2a3a 100%);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(105deg,transparent 0 16px,#ffffff0d 16px 17px)}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:90px;pointer-events:none;z-index:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40 Q50 8 100 40 T200 40 T300 40 T400 40 V80 H0Z' fill='%23164a63' fill-opacity='.75'/%3E%3C/svg%3E") repeat-x;background-size:400px 90px;animation:wave 14s linear infinite}
+@keyframes wave{to{background-position-x:-400px}}
+.wrap{position:relative;z-index:1}
+.page{border-color:#6b4328;box-shadow:0 0 0 3px #3a2417,0 0 34px #f0b73d55,0 18px 40px #000000aa}
+.hint{background:#fdf0cc}
+@media(prefers-reduced-motion:reduce){body::after{animation:none}}
 @media(max-width:420px){.wrap{padding:14px 12px 36px}.page{padding:18px 14px}.gear{gap:8px}.g{padding:10px 6px}.g .ic{font-size:32px}.btn{font-size:16px;padding:11px 22px}.rc{padding:12px}.mini svg{width:56px}.opt{padding:12px 14px;font-size:15px}}
 </style>
 </head>
@@ -61,7 +86,21 @@ h2{font-size:clamp(20px,4.6vw,26px);color:var(--navy)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
 <script type="text/babel">
-const {useState,useMemo}=React;
+const {useState,useMemo,useRef,useEffect}=React;
+
+/* ===== 報名網址設定：請在此填入正式報名網址 ===== */
+const WORKSHOP_REGISTRATION_URL = "https://forms.gle/2zmWpHzZvoMaMQve9";
+const urlReady = /^https?:\/\//i.test(WORKSHOP_REGISTRATION_URL);
+
+/* ===== 命運籤詩（共 6 種）===== */
+const FORTUNES=[
+ {n:"上上籤",ic:"🌟",t:"市場之神已經注意到你，這場 Workshop 你不來不行！"},
+ {n:"天命籤",ic:"🔮",t:"你的市場情報技能即將覺醒，下一站就在 Workshop！"},
+ {n:"奇蹟籤",ic:"🍀",t:"你以為是偶然，其實是命運安排你來升級！"},
+ {n:"緣分籤",ic:"🧵",t:"你與這場 Workshop 的緣分，早在第一次看見市場數據時就注定了！"},
+ {n:"破局籤",ic:"🗝️",t:"別再猶豫，新的市場洞察正在等你解鎖！"},
+ {n:"隱藏籤",ic:"🎁",t:"恭喜抽中命運限定任務：參加 Workshop，開啟下一場冒險！"}
+];
 
 /* ===== 人格資料 ===== */
 const P={
@@ -227,6 +266,7 @@ function Card({r,next}){
  const m=P[r[0]],s=P[r[1]];
  return(
  <div className="page">
+  <div className="hint" role="note" style={{textAlign:"center",fontWeight:700,marginTop:0,marginBottom:14}}>📸 記得截圖保存你的探險家角色卡，和夥伴交換探險故事！</div>
   <div className="rc">
    <div className="sm">MARKET INTELLIGENCE EXPLORER · 探險家角色卡</div>
    <div className="hero"><Hero k={r[0]}/></div>
@@ -236,8 +276,60 @@ function Card({r,next}){
    <Gear p={m}/>
    <div className="sm">次要人格｜{s.en}・{s.zh}</div>
   </div>
-  <p className="center" style={{fontSize:14,color:"var(--brown)"}}>📸 截圖留下你的角色卡，和夥伴交換探險故事！</p>
-  <div className="row"><button className="btn" onClick={next}>前往最後一站 🏕️</button></div>
+    <div className="row"><button className="btn" onClick={next}>前往最後一站 🏕️</button></div>
+ </div>)}
+
+function Tube({shaking}){return(
+ <div className={"tube"+(shaking?" shaking":"")}>
+  <svg viewBox="0 0 120 150" role="img" aria-label="命運籤筒">
+   <g stroke="#4a3426" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round">
+    <rect x="34" y="6" width="9" height="56" rx="3" fill="#f0b73d" transform="rotate(-10 38 60)"/>
+    <rect x="55" y="0" width="9" height="62" rx="3" fill="#e6a8a0" transform="rotate(2 60 60)"/>
+    <rect x="76" y="8" width="9" height="54" rx="3" fill="#8fbf6a" transform="rotate(12 80 60)"/>
+    <path d="M26 58 H94 L90 140 Q60 150 30 140 Z" fill="#b9814f"/>
+    <ellipse cx="60" cy="58" rx="34" ry="8" fill="#8a5a36"/>
+    <rect x="42" y="78" width="36" height="42" rx="6" fill="#f7e6b0"/>
+    <text x="60" y="108" textAnchor="middle" fontSize="26" fontWeight="900" fill="#c0392b" stroke="none">籤</text>
+   </g>
+  </svg>
+ </div>)}
+
+function Fate(){
+ const [ph,setPh]=useState("idle"),[idx,setIdx]=useState(null),[note,setNote]=useState(false);
+ const tm=useRef(null);
+ useEffect(()=>()=>clearTimeout(tm.current),[]);
+ const draw=()=>{
+  if(ph==="drawing")return;
+  setPh("drawing");setNote(false);
+  tm.current=setTimeout(()=>{
+   let n;do{n=Math.floor(Math.random()*FORTUNES.length)}while(n===idx&&FORTUNES.length>1);
+   setIdx(n);setPh("done");
+  },1700);
+ };
+ const f=idx!==null?FORTUNES[idx]:null;
+ return(
+ <div className="fate">
+  <h2>還在猶豫要不要參加嗎？</h2>
+  <p><b>科學的盡頭是玄學。</b><br/>既然市場情報都已經探索到這裡，不如讓命運幫你做最後的決定！</p>
+  {ph!=="done"&&<Tube shaking={ph==="drawing"}/>}
+  {ph==="drawing"&&<div className="spark" aria-live="polite">✨ 🔮 ✨</div>}
+  {ph==="idle"&&<div className="row"><button className="btn" onClick={draw}>🔮 抽出你的 Workshop 命運！</button></div>}
+  {ph==="drawing"&&<p style={{color:"var(--brown)",fontWeight:700}}>命運籤筒搖晃中……</p>}
+  {ph==="done"&&f&&<>
+   <div className="fcard" key={idx}>
+    <div className="fic">{f.ic}</div>
+    <div className="fn">{f.n}</div>
+    <p style={{margin:"8px 0 0",fontWeight:700}}>{f.t}</p>
+    <div className="fd">🧭 命中注定要參加這次 Workshop！</div>
+   </div>
+   <div className="row">
+    {urlReady
+     ?<a className="btn" href={WORKSHOP_REGISTRATION_URL} target="_blank" rel="noopener noreferrer">✨ 接受命運，立即報名！</a>
+     :<button className="btn" onClick={()=>setNote(true)}>✨ 接受命運，立即報名！</button>}
+    <button className="btn alt" onClick={draw}>🔮 再抽一次</button>
+   </div>
+   {note&&!urlReady&&<div className="hint" role="status">報名連結即將開放，敬請期待！請先向活動主辦單位確認報名方式。</div>}
+  </>}
  </div>)}
 
 function Closing({restart,r}){
@@ -250,7 +342,8 @@ function Closing({restart,r}){
   </div>
   <p>市場情報沒有唯一正確的蒐集方式。你的專長是起點，而不同的分析工具能讓你看見更多可能性。</p>
   <h2>準備好升級你的 Market Intelligence Skills 了嗎？</h2>
-  <div className="row"><button className="btn alt" onClick={restart}>🔄 重新測驗</button></div>
+  <Fate/>
+  <div className="row" style={{marginTop:26}}><button className="btn alt" onClick={restart}>🔄 重新測驗</button></div>
  </div>)}
 
 function App(){
